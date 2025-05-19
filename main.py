@@ -1,5 +1,3 @@
-# main.py
-
 import os
 import webbrowser
 from ttkthemes import ThemedTk
@@ -60,8 +58,12 @@ class AIApp:
         # ----- About Tab -----
         about = ttk.Frame(notebook, style='Card.TFrame')
         notebook.add(about, text="About")
+        self.setup_about_tab(about)
 
-        # EMSI logo (place emsiLogo.png next to main.py)
+    def setup_about_tab(self, frame):
+        frame.configure(style="Card.TFrame")
+
+        # EMSI Logo
         logo_path = os.path.join(os.path.dirname(__file__), "emsiLogo.png")
         if os.path.exists(logo_path):
             try:
@@ -71,78 +73,79 @@ class AIApp:
                 logo_img = ImageTk.PhotoImage(pil_img)
             except ImportError:
                 logo_img = tk.PhotoImage(file=logo_path)
-            logo_lbl = tk.Label(about, image=logo_img, bg=CARD_COLOR)
+            logo_lbl = tk.Label(frame, image=logo_img, bg=CARD_COLOR)
             logo_lbl.image = logo_img
             logo_lbl.pack(pady=(20, 10))
 
-        # Title
+        # 🔷 Titre centré
         tk.Label(
-            about,
-            text="EMSI Finance Explorer",
+            frame,
+            text="EMSI Finance Explorer – À propos",
             font=FONT_LARGE,
             bg=CARD_COLOR,
-            fg="#005D2E" 
-        ).pack(pady=(20, 10))
+            fg="#005D2E",
+            justify="center"
+        ).pack(pady=(10, 5))
 
-        # Description
-        desc = (
-            "Explore key financial analytics techniques:\n"
-            "• Price Prediction (Linear Regression)\n"
-            "• Return Clustering (K-Means)\n"
-            "• Direction Classification (Random Forest)\n"
-            "• Price Forecasting (ARIMA)\n"
-            "• Regression Cross-Validation\n\n"
-            "Built with Python, Tkinter, Scikit-learn, Matplotlib, Statsmodels\n"
-            "Author: Guennani Zakaria\n"
-            "Encadrant: Dr. Mouna El Mkhalet\n"
-
-        )
-        tk.Label(
-            about,
-            text=desc,
-            font=FONT_NORMAL,
-            bg=CARD_COLOR,
-            fg=TEXT_COLOR,
-            justify='left',
-            padx=20,
-            pady=10
-        ).pack(fill='both', expand=True)
-
-        # Links
-        links = ttk.Frame(about, style='Card.TFrame')
-        links.pack(pady=(0, 20), fill='x')
-
-        def make_link(text, url):
-            lbl = tk.Label(
-                links,
-                text=text,
-                font=FONT_NORMAL,
+        # 🔷 Infos personnelles centrées
+        info_lines = [
+            "👨‍💻 Zakaria GUENNANI – Étudiant ingénieur (3e année EMSI)",
+            "👩‍🏫 Encadrante : Dr. Mouna El Mkhalet",
+            "✉️ Email : guennanizakaria69@gmail.com",
+            "🔗 GitHub : https://github.com/G-Zak"
+        ]
+        for line in info_lines:
+            tk.Label(
+                frame,
+                text=line,
+                font=FONT_MEDIUM,
                 bg=CARD_COLOR,
-                fg=ACCENT_COLOR,
-                cursor='arrow'
-            )
-            lbl.pack(anchor='w', padx=20)
-            lbl.bind("<Button-1>", lambda e: webbrowser.open(url))
+                fg=TEXT_COLOR,
+                justify='center'
+            ).pack(pady=2)
 
-        make_link("🔗 GitHub : https://github.com/G-Zak", "https://github.com/G-Zak")
-        make_link("✉️ Email  : guennanizakaria69@gmail.com", "mailto:guennanizakaria69@gmail.com")
+        # Séparateur horizontal
+        ttk.Separator(frame, orient="horizontal").pack(fill='x', padx=40, pady=15)
 
-        # Prevent About frame from shrinking
-        about.pack_propagate(False)
+        # Zone de texte explicative
+        content = tk.Text(frame, wrap="word", font=FONT_NORMAL, bg=CARD_COLOR, relief="flat", bd=0)
+        content.pack(padx=40, pady=(0, 30), fill="both", expand=True)
 
+        texte = (
+            "🧠 EMSI Finance Explorer – IA Algo Visualizer\n\n"
+            "Cette application interactive illustre l’utilisation d’algorithmes d’intelligence artificielle "
+            "dans le domaine de l’analyse financière, à travers des données simulées réalistes.\n\n"
+
+            "🔍 Fonctionnement :\n"
+            "• Génération de données synthétiques (prix, rendements, séries temporelles…)\n"
+            "• Application d’un algorithme par onglet\n"
+            "• Visualisation graphique + métriques explicites\n\n"
+
+            "📊 Algorithmes intégrés :\n"
+            "1. 📈 Price Prediction (Régression Linéaire)\n"
+            "   → Prédiction du rendement à partir d’indicateurs passés\n"
+            "2. 📊 Return Clustering (K-Means)\n"
+            "   → Regroupement de profils de rendement en 3 clusters\n"
+            "3. 🎯 Direction Classification (Random Forest)\n"
+            "   → Classification des tendances marché (hausse / baisse)\n"
+            "4. 📉 Price Forecast (ARIMA)\n"
+            "   → Prévision du prix sur base de séries temporelles simulées\n"
+            "5. 🔁 Regression CV (Validation Croisée)\n"
+            "   → Évaluation via validation croisée (R² sur 5 sous-ensembles)\n\n"
+
+            "⚙️ Technologies : Python, Tkinter, scikit-learn, matplotlib, statsmodels, pandas\n"
+            "Interface graphique moderne et stylisée (EMSI)"
+        )
+
+        content.insert("1.0", texte)
+        content.config(state="disabled")
 
 def main():
-    # Create themed root window
     root = ThemedTk(theme="plastik")
     root.geometry("1200x800")
-
-    # Apply EMSI custom styling
     apply_style(root, theme="plastik")
-
-    # Launch application
     app = AIApp(root)
     root.mainloop()
-
 
 if __name__ == "__main__":
     main()
