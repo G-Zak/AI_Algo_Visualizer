@@ -105,41 +105,50 @@ class RegressionTab(BaseTab):
 
     def run_algorithm(self):
         self.clear_output()
-        # Simulate stock price via geometric Brownian motion
         np.random.seed(42)
         n = 200
-        dt = 1/252
-        mu, sigma = 0.1, 0.2
-        prices = [100]
-        for _ in range(n-1):
-            prices.append(prices[-1] * np.exp((mu - 0.5*sigma**2)*dt + sigma*np.sqrt(dt)*np.random.randn()))
-        prices = np.array(prices)
-        # Create features: past 5-day MA and volatility
+
+        # Simuler des caractéristiques réalistes (ma5 = moyenne mobile, vol5 = volatilité)
+        ma5 = np.random.normal(loc=100, scale=10, size=n)        # ex : prix moyen autour de 100
+        vol5 = np.random.normal(loc=5, scale=2, size=n)          # ex : volatilité entre 3 et 7
+
+        # Générer un "retour" réaliste basé sur ces features + bruit
+        returns = 0.0008 * ma5 - 0.002 * vol5 + np.random.normal(0, 0.01, size=n)
+
+        # Créer le DataFrame
         df = pd.DataFrame({
-            'price': prices
+            'ma5': ma5,
+            'vol5': vol5,
+            'return': returns
         })
-        df['ma5'] = df['price'].rolling(5).mean().fillna(method='bfill')
-        df['vol5'] = df['price'].rolling(5).std().fillna(method='bfill')
-        # Target: next-day return
-        df['return'] = df['price'].pct_change().shift(-1).fillna(0)
-        X = df[['ma5','vol5']]
+
+        # Séparation features / target
+        X = df[['ma5', 'vol5']]
         y = df['return']
-        # Linear regression
+
+        # Régression linéaire
         model = LinearRegression().fit(X, y)
         y_pred = model.predict(X)
         r2 = r2_score(y, y_pred)
         mse = mean_squared_error(y, y_pred)
+
         self.output_text.insert('end',
             f"Regression Results:\n"
             f"• R²: {r2:.4f}\n"
             f"• MSE: {mse:.6f}\n"
         )
-        # Plot actual vs predicted returns
-        fig, ax = plt.subplots(figsize=(6,4))
-        ax.scatter(y, y_pred, color=PRIMARY_COLOR, alpha=0.6, label="Pred vs Actual")
-        ax.plot([-0.05,0.05],[-0.05,0.05], '--', color=HIGHLIGHT)
-        ax.set(title="Return Prediction", xlabel="Actual Return", ylabel="Predicted Return")
+
+        # Graphique amélioré
+        fig, ax = plt.subplots(figsize=(6.5, 4.5))
+        ax.scatter(y, y_pred, color=PRIMARY_COLOR, alpha=0.7, s=40, label="Pred vs Actual")
+        ax.plot([y.min(), y.max()], [y.min(), y.max()], '--', color=HIGHLIGHT, label="Ideal")
+
+        ax.set_title("Return Prediction", fontsize=13, weight='bold')
+        ax.set_xlabel("Actual Return")
+        ax.set_ylabel("Predicted Return")
+        ax.grid(True, linestyle="--", alpha=0.3)
         ax.legend(frameon=False)
+
         self.show_plot(fig)
 
 class ClusteringTab(BaseTab):
@@ -236,23 +245,48 @@ class ValidationTab(BaseTab):
 
     def run_algorithm(self):
         self.clear_output()
-        # reuse regression features
+
+        # Génération des données
         np.random.seed(42)
         n = 150
         X = pd.DataFrame({
             'ma10': np.random.rand(n),
             'vol10': np.random.rand(n)
         })
-        y = 0.5*X['ma10'] - 0.3*X['vol10'] + np.random.randn(n)*0.05
+        y = 0.5*X['ma10'] - 0.3*X['vol10'] + np.random.randn(n)*0.2
+        # Modèle
         model = LinearRegression()
-        scores = cross_val_score(model, X, y, cv=KFold(5), scoring='r2')
+        kf = KFold(5, shuffle=True, random_state=42)
+        scores = cross_val_score(model, X, y, cv=kf, scoring='r2')
+
+        # Texte dans la zone de sortie
         self.output_text.insert('end',
             f"Cross-Validation R² Scores:\n" +
-            "\n".join(f"Fold {i+1}: {s:.3f}" for i,s in enumerate(scores)) +
+            "\n".join(f"Fold {i+1}: {s:.3f}" for i, s in enumerate(scores)) +
             f"\nMean: {scores.mean():.3f}"
         )
-        fig, ax = plt.subplots(figsize=(6,4))
-        ax.bar(range(1,6), scores, color=PRIMARY_COLOR, alpha=0.6)
-        ax.axhline(scores.mean(), ls='--', color=HIGHLIGHT)
-        ax.set(title="CV R² Scores", xlabel="Fold", ylabel="Score")
+
+        # Graphique stylisé
+        fig, ax = plt.subplots(figsize=(6.5, 4.5))
+
+        bars = ax.bar(range(1, 6), scores, color="#4CAF50", edgecolor="#2E7D32", width=0.5)
+
+        # Ligne horizontale de la moyenne
+        ax.axhline(scores.mean(), color="#FFA500", linestyle="--", linewidth=2, label="Mean R²")
+
+        # Étiquettes
+        ax.set_title("Cross-Validation R² Scores", fontsize=14, weight='bold', color="#2C3E50")
+        ax.set_xlabel("Fold", fontsize=12)
+        ax.set_ylabel("R² Score", fontsize=12)
+        ax.set_ylim(0, 1.05)
+
+        # Valeur au-dessus de chaque barre
+        for i, b in enumerate(bars):
+            height = b.get_height()
+            ax.text(b.get_x() + b.get_width()/2, height + 0.02, f"{height:.2f}",
+                    ha='center', fontsize=10, color="#333")
+
+        ax.legend(frameon=False)
+        ax.grid(axis='y', linestyle='--', alpha=0.3)
+
         self.show_plot(fig)

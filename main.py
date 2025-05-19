@@ -94,7 +94,7 @@ class AIApp:
             "• Regression Cross-Validation\n\n"
             "Built with Python, Tkinter, Scikit-learn, Matplotlib, Statsmodels\n"
             "Author: Guennani Zakaria\n"
-            "Encadrante: Mme Mouna El Mkhalet\n"
+            "Encadrant: Dr. Mouna El Mkhalet\n"
 
         )
         tk.Label(
