@@ -75,7 +75,6 @@ IA_Algo_V3/
 
 ![App Screenshot](assets/Screenshot.png)
 
----
 
 ## 👨‍💻 Author
 
@@ -156,7 +155,6 @@ IA_Algo_V3/
 ├── main.py             # Logique principale
 ├── algorithms.py       # Algorithmes IA
 ├── style.py            # Style visuel EMSI
-├── emsiLogo.png        # Logo EMSI
 ├── requirements.txt
 ├── assets/
 └── README.md

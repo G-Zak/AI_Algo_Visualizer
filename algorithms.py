@@ -37,7 +37,7 @@ class BaseTab(ttk.Frame):
         self.setup_ui()
         
     def setup_ui(self):
-        # Header with title and buttons
+        # Header
         header = ttk.Frame(self, style='Card.TFrame')
         header.grid(row=0, column=0, sticky='ew', padx=10, pady=10)
         tk.Label(
