@@ -64,9 +64,8 @@ IA_Algo_V3/
 ├── main.py             # Main interface logic
 ├── algorithms.py       # Tabs with each algorithm
 ├── style.py            # Color palette and UI components
-├── emsiLogo.png        # EMSI branding
 ├── requirements.txt    # Required dependencies
-├── assets/             # Screenshots and icons
+├── assets/             # Screenshots 
 └── README.md
 ```
 
